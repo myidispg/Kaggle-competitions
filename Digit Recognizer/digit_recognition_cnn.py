@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Sep  8 18:10:30 2018
-
 @author: Prashant Goyal
 """
 
@@ -59,3 +58,8 @@ y_predict = classifier.predict_classes(X_test)
 
 # This is done to generate the output matrix with indexing of each image
 predict = np.column_stack((np.arange(1,28001), y_predict))
+
+# Generate a csv file with column names and indexes.
+np.savetxt("predict.csv", predict, fmt='%i', delimiter=",", header='ImageId,Label', comments='')
+
+print ('predict.csv')
