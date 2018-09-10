@@ -78,6 +78,7 @@ df_test = pd.DataFrame(X_test)
 
 nan_test = df_test.isnull().any()
 nan_train = df_train.isnull().any()
+
 # Encoding the categorical data
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 labelencoder_X = LabelEncoder()
