@@ -17,6 +17,9 @@ y_train = dataset_train.iloc[:, 1].values
 # Importing the test dataset
 dataset_test = pd.read_csv('test.csv')
 X_test = dataset_test.iloc[:, [1,3,4,5,6,8,10]].values
+
+dataset_y_test = pd.read_csv('gender_submission.csv')
+y_test = dataset_y_test.iloc[:, 1].values
 #------------------------------------
 
 # Converting X_train from object to array
@@ -110,20 +113,34 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
+# Applying PCA
+from sklearn.decomposition import PCA
+pca = PCA(n_components=6)
+X_train_pca = pca.fit_transform(X_train)
+X_test_pca = pca.transform(X_test)
+explained_variance = pca.explained_variance_ratio_
+
 # We can now apply various fitting methods.
 # Fitting Kernel SVM to the Training set
 from sklearn.svm import SVC
 classifier = SVC(kernel = 'rbf', C=1, gamma=0.7, random_state = 0)
-classifier.fit(X_train, y_train)
+classifier.fit(X_train_pca, y_train)
+
+# Fitting Random Forest Classification to the Training set
+from sklearn.ensemble import RandomForestClassifier
+classifier_forest = RandomForestClassifier(n_estimators = 10, criterion = 'entropy', random_state = 0)
+classifier_forest.fit(X_train_pca, y_train)
 
 # Predicting the Test set results
-y_pred = classifier.predict(X_test)
+y_pred = classifier.predict(X_test_pca)
+y_pred_forest = classifier_forest.predict(X_test_pca)
 
 # Applying k-Fold Cross Validation
 from sklearn.model_selection import cross_val_score
-accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
+accuracies = cross_val_score(estimator = classifier_forest, X = X_train, y = y_train, cv = 10)
 accuracies.mean()
 accuracies.std()
+
 
 # Applying Grid Search to find the best model and the best parameters
 from sklearn.model_selection import GridSearchCV
@@ -135,8 +152,19 @@ parameters = [{'C':[1,10,100,1000], 'kernel':['linear']},
 grid_search = GridSearchCV(estimator = classifier,
                            param_grid = parameters,
                            scoring = 'accuracy',
-                           cv = 10)
+                           cv = 5,
+                           verbose = 5,
+                           n_jobs = -1)
 
 grid_search = grid_search.fit(X_train, y_train)
 best_accuracy = grid_search.best_score_
 best_parameters = grid_search.best_params_
+
+# Making the confusion matrix
+from sklearn.metrics import confusion_matrix
+cm_kernel_svm = confusion_matrix(y_test, y_pred)
+
+# Making the CSV file
+submission_kernel_svm = pd.DataFrame(y_pred)
+filename = 'Titanic-Survival-kernel_svm.csv'
+submission_kernel_svm.to_csv(filename, index=False)
