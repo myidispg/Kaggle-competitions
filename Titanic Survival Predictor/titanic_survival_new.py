@@ -123,8 +123,9 @@ explained_variance = pca.explained_variance_ratio_
 # We can now apply various fitting methods.
 # Fitting Kernel SVM to the Training set
 from sklearn.svm import SVC
-classifier = SVC(kernel = 'rbf', C=1, gamma=0.7, random_state = 0)
-classifier.fit(X_train_pca, y_train)
+classifier = SVC(kernel = 'rbf', C=1, gamma=0.13, random_state = 0)
+classifier.fit(X_train, y_train)
+classifier.accuracy
 
 # Fitting Random Forest Classification to the Training set
 from sklearn.ensemble import RandomForestClassifier
@@ -132,12 +133,12 @@ classifier_forest = RandomForestClassifier(n_estimators = 10, criterion = 'entro
 classifier_forest.fit(X_train_pca, y_train)
 
 # Predicting the Test set results
-y_pred = classifier.predict(X_test_pca)
+y_pred = classifier.predict(X_test)
 y_pred_forest = classifier_forest.predict(X_test_pca)
 
 # Applying k-Fold Cross Validation
 from sklearn.model_selection import cross_val_score
-accuracies = cross_val_score(estimator = classifier_forest, X = X_train, y = y_train, cv = 10)
+accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
 accuracies.mean()
 accuracies.std()
 
@@ -156,9 +157,27 @@ grid_search = GridSearchCV(estimator = classifier,
                            verbose = 5,
                            n_jobs = -1)
 
-grid_search = grid_search.fit(X_train, y_train)
-best_accuracy = grid_search.best_score_
-best_parameters = grid_search.best_params_
+def gridSearch(xtrain, ytrain):
+    X_train = xtrain
+    y_train = ytrain
+    classifier = SVC()
+    parameters = [{'C':[1,10,100,1000], 'kernel':['linear']},
+               {'C':[1,10,100,1000], 'kernel':['rbf'], 'gamma': [0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19]},
+               {'C':[1,10,100,1000], 'kernel':['poly'], 'degree':[3,4,5,6,7], 'gamma': [0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19]}
+               ]
+    grid_search = GridSearchCV(estimator = classifier,
+                           param_grid = parameters, 
+                           scoring = 'accuracy',
+                           cv = 5,
+                           verbose = 5,
+                           n_jobs = 4)
+    grid_search = grid_search.fit(X_train, y_train)
+    best_accuracy = grid_search.best_score_
+    best_parameters = grid_search.best_params_
+    
+if __name__ == '__main__':
+    gridSearch(X_train, y_train)    
+
 
 # Making the confusion matrix
 from sklearn.metrics import confusion_matrix
