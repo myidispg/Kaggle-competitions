@@ -66,7 +66,7 @@ y_pred_forest = classifier_forest.predict(X_test)
 # Convert decimals to 1 if greater than 0.5 else 0
 for i in range(0, 28000):
     for j in range(0, 10):
-        y_pred[i][j] = (y_pred[i][j] > 0.4)
+        y_pred[i][j] = (y_pred[i][j] > 0.5)
         
 # Decode one hot encoded variables
 y_pred = np.argmax(y_pred, axis=1)
@@ -76,7 +76,17 @@ y_train = np.argmax(y_train, axis=1)
 # Create image from pixel
 from PIL import Image
 im = Image.new('L', (28,28))
-im.putdata(X_test[2])
+for index in range(0, len(y_pred)):
+    im.putdata(X_test[index])
+    im.show()
+    print("The predicted digit is- " + str(y_pred[index])) 
+    user = input('Want to test the next image? (y/n)- ')
+    if user == 'y' or user == 'Y':
+        pass
+    else:
+        break
+
+im.putdata(X_test[27995])
 im.show()
 
 # Creating a csv for predictions
