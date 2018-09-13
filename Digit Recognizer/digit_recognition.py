@@ -20,9 +20,9 @@ X_test = dataset_test.iloc[:, :].values
 
 # Encoding y_train to categorical
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-labelencoder_X = LabelEncoder()
+labelencoder_y = LabelEncoder()
 y_train.reshape(42000,1)
-y_train[:, 0] = labelencoder_X.fit_transform(y_train[:,0])
+y_train = labelencoder_y.fit_transform(y_train)
 onehotencoder = OneHotEncoder(categorical_features = [0])
 y_train = onehotencoder.fit_transform(y_train).toarray()
 
@@ -46,7 +46,7 @@ classifier.add(Dense(10, init = 'uniform', activation = 'softmax'))
 
 classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
-classifier.fit(X_train, y_train, batch_size = 10, epochs = 30)
+classifier.fit(X_train, y_train, batch_size = 10, epochs = 10)
 
 # Fitting the naive bayes classifier to our dataset
 from sklearn.naive_bayes import GaussianNB
@@ -66,12 +66,18 @@ y_pred_forest = classifier_forest.predict(X_test)
 # Convert decimals to 1 if greater than 0.5 else 0
 for i in range(0, 28000):
     for j in range(0, 10):
-        y_pred[i][j] = (y_pred[i][j] > 0.5)
+        y_pred[i][j] = (y_pred[i][j] > 0.4)
         
 # Decode one hot encoded variables
 y_pred = np.argmax(y_pred, axis=1)
 y_pred_forest = np.argmax(y_pred_forest, axis = 1)
 y_train = np.argmax(y_train, axis=1)
+
+# Create image from pixel
+from PIL import Image
+im = Image.new('L', (28,28))
+im.putdata(X_test[2])
+im.show()
 
 # Creating a csv for predictions
 submission = pd.DataFrame(y_pred)

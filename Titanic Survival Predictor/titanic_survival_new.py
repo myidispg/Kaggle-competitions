@@ -11,7 +11,14 @@ import pandas as pd
 
 # Importing the train dataset
 dataset_train = pd.read_csv('train.csv')
+data_df =dataset_train
+data_df['Family Size'] = data_df['Parch'] + data_df['SibSp']
+family = dataset_train['SibSp'].values + dataset_train['Parch'].values
+# X_train = dataset_train.iloc[:, [2,4,5,family,9,11]].values
 X_train = dataset_train.iloc[:, [2,4,5,6,7,9,11]].values
+# X_train = dataset_train.iloc[:, [2,4,5,6,7,8,9,11]].values
+# X_train = dataset_train.iloc[:, [2,4,5]].toArray()
+X_train = X_train.concate(family)
 y_train = dataset_train.iloc[:, 1].values
 
 # Importing the test dataset
@@ -115,7 +122,7 @@ X_test = sc.transform(X_test)
 
 # Applying PCA
 from sklearn.decomposition import PCA
-pca = PCA(n_components=6)
+pca = PCA(n_components=2)
 X_train_pca = pca.fit_transform(X_train)
 X_test_pca = pca.transform(X_test)
 explained_variance = pca.explained_variance_ratio_
@@ -123,22 +130,21 @@ explained_variance = pca.explained_variance_ratio_
 # We can now apply various fitting methods.
 # Fitting Kernel SVM to the Training set
 from sklearn.svm import SVC
-classifier = SVC(kernel = 'rbf', C=1, gamma=0.13, random_state = 0)
+classifier = SVC(kernel = 'rbf', C=1, gamma=0.19, random_state = 0)
 classifier.fit(X_train, y_train)
-classifier.accuracy
 
 # Fitting Random Forest Classification to the Training set
 from sklearn.ensemble import RandomForestClassifier
-classifier_forest = RandomForestClassifier(n_estimators = 10, criterion = 'entropy', random_state = 0)
-classifier_forest.fit(X_train_pca, y_train)
+classifier_forest = RandomForestClassifier(n_estimators = 1000, criterion = 'entropy', random_state = 0)
+classifier_forest.fit(X_train, y_train)
 
 # Predicting the Test set results
 y_pred = classifier.predict(X_test)
-y_pred_forest = classifier_forest.predict(X_test_pca)
+y_pred_forest = classifier_forest.predict(X_test)
 
 # Applying k-Fold Cross Validation
 from sklearn.model_selection import cross_val_score
-accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
+accuracies = cross_val_score(estimator = classifier_forest, X = X_train, y = y_train, cv = 10)
 accuracies.mean()
 accuracies.std()
 
@@ -187,3 +193,48 @@ cm_kernel_svm = confusion_matrix(y_test, y_pred)
 submission_kernel_svm = pd.DataFrame(y_pred)
 filename = 'Titanic-Survival-kernel_svm.csv'
 submission_kernel_svm.to_csv(filename, index=False)
+
+submission_forest = pd.DataFrame(y_pred_forest)
+filename = 'Titanic-Survival-random-forest.csv'
+submission_forest.to_csv(filename, index=False)
+
+# Plotting survived status against different features extracted using PCA
+pos_index = [] # indexes of all positives in y
+for i in range(0, len(y_train)):
+    if y_train[i] == 1:
+        pos_index.append(i) 
+
+neg_index = []
+for i in range(0, len(y_train)):
+    if y_train[i] == 0:
+        neg_index.append(i) 
+        
+pos_0 = []
+for index in pos_index:
+    pos_0.append(X_train_pca[index, 0])
+    
+pos_1 = []
+for index in pos_index:
+    pos_1.append(X_train_pca[index, 1])
+    
+neg_0 = []
+for index in neg_index:
+    neg_0.append(X_train_pca[index, 0])
+    
+neg_1 = []
+for index in neg_index:
+    neg_1.append(X_train_pca[index, 1])
+    
+y_pos = []
+for index in pos_index:
+    y_pos.append(y_train[index])
+    
+y_neg = []
+for index in neg_index:
+    y_neg.append(y_train[index])
+    
+plt.scatter(pos_0, y_pos, color='red')
+plt.scatter(X_train_pca[:, 1], y_train, color='blue')
+plt.legend()
+plt.show()
+
