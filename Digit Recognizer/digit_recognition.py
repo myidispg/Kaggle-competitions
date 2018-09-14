@@ -75,11 +75,13 @@ y_train = np.argmax(y_train, axis=1)
 
 # Create image from pixel
 from PIL import Image
+import time
 im = Image.new('L', (28,28))
 for index in range(0, len(y_pred)):
     im.putdata(X_test[index])
-    im.show()
     print("The predicted digit is- " + str(y_pred[index])) 
+    time.sleep(3)
+    im.show()
     user = input('Want to test the next image? (y/n)- ')
     if user == 'y' or user == 'Y':
         pass
