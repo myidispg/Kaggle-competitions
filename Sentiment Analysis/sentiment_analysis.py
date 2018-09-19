@@ -18,7 +18,9 @@ y_train = dataset_train.iloc[:, 3:].values
 dataset_test = pd.read_csv('test.tsv', delimiter = '\t', quoting = 3)
 X_test = dataset_test.iloc[:, 2:].values
 
-# Cleaning the datasets
+#-----------TRAIN DATASET------------------------------------------------------
+
+# Cleaning the dataset
 import re
 import nltk # library for nlp
 nltk.download('stopwords')
@@ -60,3 +62,6 @@ y_pred_logistics = classifier_logistics.predict(X__train_test)
 # Making the Confusion Matrix
 from sklearn.metrics import confusion_matrix
 cm_logistics = confusion_matrix(y_train_test, y_pred_logistics)
+
+
+#-------------TEST DATASET---------------------------------------
