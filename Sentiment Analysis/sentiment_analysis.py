@@ -43,7 +43,7 @@ for i in range(0, len(dataset_train)):
     
 # Creating the Bag of Words model
 from sklearn.feature_extraction.text import CountVectorizer 
-cv = CountVectorizer() # This keeps only the 1500 most occuring words.
+cv = CountVectorizer(max_features = 6500) # This keeps only the 6500 most occuring words.
 X_train = cv.fit_transform(corpus).toarray()
 y_train = dataset_train.iloc[:, 3].values
 
@@ -104,7 +104,7 @@ for i in range(0, len(dataset_test)):
     
 # Creating the Bag of Words model
 from sklearn.feature_extraction.text import CountVectorizer 
-cv = CountVectorizer() # This keeps only the 1500 most occuring words.
+cv = CountVectorizer(max_features = 6500) # This keeps only the 6500 most occuring words.
 X_test = cv.fit_transform(corpus_test).toarray()
 
 # Predicting the Test set results
