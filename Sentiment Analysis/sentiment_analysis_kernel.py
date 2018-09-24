@@ -96,8 +96,18 @@ from sklearn.linear_model import LogisticRegression
 lr=LogisticRegression() 
 lr.fit(c2_train,y)
 
+# Naive Bayes
+from sklearn.naive_bayes import GaussianNB
+nb = GaussianNB()
+nb.fit(c2_train, y)
+
 y_pred=lr.predict(c2_test)
+
+pred_nb = nb.predict(c2_test)
 
 sub.Sentiment=y_pred
 sub.head()
 sub.to_csv('submission.csv',index=False)
+
+sub.Sentiment = pred_nb
+sub.to_csv('submission.csv', index=False)
