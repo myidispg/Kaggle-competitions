@@ -62,3 +62,42 @@ def clean_review(review_col):
 df['clean_review'] = clean_review(df.Phrase.values)
 df.head()
 
+# Seperating test and train set
+df_train=df[df.Sentiment!=-999]
+df_train.shape
+
+df_test=df[df.Sentiment==-999]
+df_test.drop('Sentiment',axis=1,inplace=True)
+print(df_test.shape)
+df_test.head()
+
+del df
+gc.collect()
+
+# Bag of Words model
+from sklearn.feature_extraction.text import TfidfVectorizer
+tfidf=TfidfVectorizer(ngram_range=(1,2),max_df=0.95,min_df=10,sublinear_tf=True)
+
+c2_train=tfidf.fit_transform(df_train.clean_review).toarray()
+print(c2_train.shape)
+c2_test=tfidf.transform(df_test.clean_review).toarray()
+print(c2_test.shape)
+
+# One Hot Encoding dependent variable
+from sklearn.preprocessing import LabelEncoder,OneHotEncoder
+le=LabelEncoder()
+y=le.fit_transform(df_train.Sentiment.values)
+y.shape
+del df_train,df_test
+gc.collect()
+
+# Logistic Regression
+from sklearn.linear_model import LogisticRegression
+lr=LogisticRegression() 
+lr.fit(c2_train,y)
+
+y_pred=lr.predict(c2_test)
+
+sub.Sentiment=y_pred
+sub.head()
+sub.to_csv('submission.csv',index=False)
