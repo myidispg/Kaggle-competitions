@@ -31,21 +31,50 @@ train.isna().sum()
 test.isna().sum()
 df.isna().sum()
 
+# Deleting train and test
+del train, test
+
 # Now, we will deal with the missing values in age column by getting their broad values by the initial of names.
 # Mr., Mrs. will be aged 18-60, master and miss will be 10-18.
 
-child_list_index = []
-adult_list_index = []
-
-# This list is just to check whether all the titles are added. The length of this string must be equal to the length of train + test set.
+# This list is also to check whether all the titles are added. The length of this string must be equal to the length of train + test set.
 names_list = []
 
 # Using this loop, we can get the missing age indexes.
-for i in range(0, len(train)):
+for i in range(0, len(df)):
     # Split by , to get last name seperate and first name seperate.
-    names = train.Name.iloc[i].split(',')
+    names = df.Name.iloc[i].split(',')
     # The first name part will always be at the end of the list
     names = names[1]
     # Split by . to get initial in the first place.
     names = names.split('.')
     names_list.append(names[0])
+    
+# Getting the index of Mr. and Mrs. in one list, Master and Miss in other.
+child_index = []
+adult_index = []
+
+for i in range(len(names_list)):
+    if names_list[i] == ' Mr' or names_list[i] == ' Mrs':
+        if pd.isnull(df.Age.iloc[i]):
+            adult_index.append(i)
+    else:
+         if pd.isnull(df.Age.iloc[i]):
+            child_index.append(i)
+        
+# ^^ Now we have the adult and child indexes seperate, we can now assign random ages in respective age groups
+max_age = int(df.Age.max())      
+min_age = int(df.Age.min())
+
+import random
+for i in adult_index:
+    df.Age.iloc[i] = random.randint(18, max_age)
+for i in child_index:
+    df.Age.iloc[i] = random.randint(min_age, 18)
+
+del i, names, names_list,max_age, min_age
+
+# Now we will deal with missing values in Embarked and Fare category.
+
+
+
