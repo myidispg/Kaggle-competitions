@@ -50,6 +50,9 @@ for i in range(0, len(df)):
     names = names.split('.')
     names_list.append(names[0])
     
+# Now name is not needed, we can drop the column.
+df.drop('Name', axis=1, inplace=True)
+    
 # Getting the index of Mr. and Mrs. in one list, Master and Miss in other.
 child_index = []
 adult_index = []
@@ -75,6 +78,18 @@ for i in child_index:
 del i, names, names_list,max_age, min_age
 
 # Now we will deal with missing values in Embarked and Fare category.
+embarked_mode = df.Embarked.mode().values
+# Since the mode is 'S', we will replace the missing values in Embarked column with S
+df['Embarked'].fillna('S', inplace=True)
 
+fare_mean = int(df.Fare.mean())
+df['Fare'].fillna(fare_mean, inplace=True)
 
+del embarked_mode, fare_mean
+
+# Splitting the df into train and test set
+df_train = df[df.Survived != 999]
+df_test = df[df.Survived == 999]
+
+del df
 
