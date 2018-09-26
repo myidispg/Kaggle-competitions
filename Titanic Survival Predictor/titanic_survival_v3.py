@@ -88,12 +88,24 @@ df['Fare'].fillna(fare_mean, inplace=True)
 del embarked_mode, fare_mean
 
 # Splitting the df into train and test set
-df_train = df[df.Survived != 999]
-df_test = df[df.Survived == 999]
+#df_train = df[df.Survived != 999]
+#df_test = df[df.Survived == 999]
 
-del df
+# del df
 #-----Finished data preprocessing--------
 
 df_train.isna().sum()
 df_test.isna().sum()
 
+# LabelEncoding and OneHotEncoding
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+labelencoder = LabelEncoder()
+df.Embarked = labelencoder.fit_transform(df.Embarked.values)
+df.Sex = labelencoder.fit_transform(df.Sex.values)
+
+onehotencoder = OneHotEncoder(categorical_features = [1,5])
+df = onehotencoder.fit_transform(df).toarray()
+
+df = pd.get_dummies(df,columns=['Embarked', 'Sex'], drop_first=True)
+
+#------Completed all encodings.------------
