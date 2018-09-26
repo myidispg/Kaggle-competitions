@@ -75,7 +75,7 @@ for i in adult_index:
 for i in child_index:
     df.Age.iloc[i] = random.randint(min_age, 18)
 
-del i, names, names_list,max_age, min_age
+del i, names, names_list,max_age, min_age, adult_index, child_index
 
 # Now we will deal with missing values in Embarked and Fare category.
 embarked_mode = df.Embarked.mode().values
@@ -92,4 +92,8 @@ df_train = df[df.Survived != 999]
 df_test = df[df.Survived == 999]
 
 del df
+#-----Finished data preprocessing--------
+
+df_train.isna().sum()
+df_test.isna().sum()
 
