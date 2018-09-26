@@ -102,10 +102,6 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 labelencoder = LabelEncoder()
 df.Embarked = labelencoder.fit_transform(df.Embarked.values)
 df.Sex = labelencoder.fit_transform(df.Sex.values)
-
-onehotencoder = OneHotEncoder(categorical_features = [1,5])
-df = onehotencoder.fit_transform(df).toarray()
-
+    # Encoding a dataframe
 df = pd.get_dummies(df,columns=['Embarked', 'Sex'], drop_first=True)
-
 #------Completed all encodings.------------
